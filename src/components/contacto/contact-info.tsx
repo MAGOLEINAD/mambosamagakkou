@@ -9,36 +9,34 @@ const ITEMS = [
 
 export function ContactInfo() {
   return (
-    <div className="space-y-6">
+    <div className="divide-y divide-white/10">
       {ITEMS.map(({ icon: Icon, label, value, href }) => (
-        <div key={label} className="flex items-start gap-4">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
-            <Icon className="size-5" aria-hidden="true" />
+        <div key={label} className="flex items-center gap-4 py-3.5 first:pt-0">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-gold">
+            <Icon className="size-4.5" aria-hidden="true" />
           </span>
-          <div>
-            <p className="text-sm font-semibold tracking-wide text-ink-soft uppercase">{label}</p>
+          <div className="min-w-0">
+            <p className="text-xs font-bold tracking-wider text-gold uppercase">{label}</p>
             {href ? (
-              <a href={href} className="text-base text-ink hover:text-brand">
+              <a href={href} className="block text-[15px] font-medium text-white hover:text-white/80">
                 {value}
               </a>
             ) : (
-              <p className="text-base text-ink">{value}</p>
+              <p className="text-[15px] font-medium text-white">{value}</p>
             )}
           </div>
         </div>
       ))}
 
-      <div className="flex items-start gap-4">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
-          <Clock className="size-5" aria-hidden="true" />
+      <div className="flex items-center gap-4 py-3.5 last:pb-0">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-gold">
+          <Clock className="size-4.5" aria-hidden="true" />
         </span>
-        <div>
-          <p className="text-sm font-semibold tracking-wide text-ink-soft uppercase">Horarios</p>
-          {HOURS.map((h) => (
-            <p key={h.days} className="text-base text-ink">
-              {h.days}: {h.time}
-            </p>
-          ))}
+        <div className="min-w-0">
+          <p className="text-xs font-bold tracking-wider text-gold uppercase">Horarios</p>
+          <p className="text-[15px] font-medium text-white">
+            {HOURS.map((h) => `${h.days} ${h.time}`).join(" · ")}
+          </p>
         </div>
       </div>
     </div>

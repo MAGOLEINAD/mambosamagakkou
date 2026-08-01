@@ -18,7 +18,7 @@ export function NosotrosTeaser() {
       <div className="relative z-10 mx-auto max-w-2xl px-4 text-center text-white">
         <p className="text-sm font-semibold tracking-[0.25em] text-gold uppercase">Quiénes somos</p>
         <h2 className="mt-3 font-heading text-4xl font-semibold sm:text-5xl">Nuestra historia</h2>
-        <BrushUnderline className="mx-auto mt-4 h-4 w-32 text-gold" />
+        <BrushUnderline className="mx-auto mt-4 h-1 w-32 text-gold" />
         <p className="mt-6 text-lg text-white/90">
           La institución fue fundada en 2020 con el objetivo inicial de ofrecer clases
           virtuales de Japonés. Con el tiempo, expandimos nuestra oferta a otros idiomas

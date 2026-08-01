@@ -32,7 +32,7 @@ export function PageHeader({
         {eyebrow && (
           <p className="text-sm font-bold text-white uppercase">{eyebrow}</p>
         )}
-        <BrushUnderline className="mx-auto mt-3 h-2 w-32 text-gold" />
+        <BrushUnderline className="mx-auto mt-3 h-1 w-32 text-gold" />
         <h1 className="mt-5 font-heading text-4xl leading-tight font-semibold sm:text-6xl">
           {title}
         </h1>

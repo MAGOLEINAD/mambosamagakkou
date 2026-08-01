@@ -35,7 +35,7 @@ export function SectionHeading({
         {title}
       </Heading>
       <BrushUnderline
-        className={cn("mt-4 h-5 w-36 text-brand", align === "center" && "mx-auto")}
+        className={cn("mt-4 h-1 w-36 text-brand", align === "center" && "mx-auto")}
       />
       {description && (
         <p className="mt-5 max-w-2xl text-lg text-ink-soft">

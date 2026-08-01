@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/metadata";
 import { Hero } from "@/components/home/hero";
-import { QuoteBlock } from "@/components/home/quote-block";
 import { NosotrosTeaser } from "@/components/home/nosotros-teaser";
 import { ModalidadSection } from "@/components/shared/modalidad-section";
 import { CourseCards } from "@/components/shared/course-cards";
@@ -34,7 +33,6 @@ export default function Home() {
 
       <NosotrosTeaser />
       <ModalidadSection />
-      <QuoteBlock />
     </>
   );
 }
