@@ -13,10 +13,10 @@ export function Hero() {
         fill
         priority
         sizes="100vw"
-        className="object-cover object-[58%_-6%] sm:object-[50%_-6%]"
+        className="object-cover object-[58%_-6%] sm:object-[50%_15%]"
       />
       <div
-        className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/50 to-ink/5"
+        className="absolute inset-0 bg-linear-to-t from-ink/95 via-ink/50 to-ink/5"
         aria-hidden="true"
       />
 

@@ -6,7 +6,7 @@ import { ContactInfo } from "@/components/contacto/contact-info";
 import { BrushUnderline } from "@/components/motifs/brush-underline";
 import { DragonMotif } from "@/components/motifs/dragon-motif";
 import { buttonVariants } from "@/components/ui/button";
-import { DEFAULT_WHATSAPP_MESSAGE, whatsappLink } from "@/lib/constants";
+import { WhatsAppMenu } from "@/components/shared/whatsapp-menu";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -45,14 +45,19 @@ export default function ContactoPage() {
                 <p className="mt-4 text-sm text-white/70">
                   La forma más rápida de recibir información e inscribirte a nuestros cursos.
                 </p>
-                <a
-                  href={whatsappLink(DEFAULT_WHATSAPP_MESSAGE)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(buttonVariants({ variant: "pill", size: "xl" }), "mt-8")}
+                <WhatsAppMenu
+                  align="start"
+                  side="bottom"
+                  sideOffset={10}
+                  trigger={
+                    <button
+                      type="button"
+                      className={cn(buttonVariants({ variant: "pill", size: "xl" }), "mt-8")}
+                    />
+                  }
                 >
                   Iniciar conversación
-                </a>
+                </WhatsAppMenu>
               </div>
 
               <div className="flex flex-col justify-center">

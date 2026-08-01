@@ -13,6 +13,7 @@ import {
   SheetTitle,
   SheetClose,
 } from "@/components/ui/sheet";
+import { WhatsAppMenu } from "@/components/shared/whatsapp-menu";
 import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -53,12 +54,22 @@ export function Header() {
           })}
         </nav>
 
-        <Link
-          href="/contacto"
-          className={cn(buttonVariants({ variant: "pill", size: "lg" }), "hidden md:inline-flex")}
+        <WhatsAppMenu
+          align="end"
+          side="bottom"
+          sideOffset={10}
+          trigger={
+            <button
+              type="button"
+              className={cn(
+                buttonVariants({ variant: "pill", size: "lg" }),
+                "hidden px-7 md:inline-flex"
+              )}
+            />
+          }
         >
           Inscribirse
-        </Link>
+        </WhatsAppMenu>
 
         <Sheet>
           <SheetTrigger
@@ -86,16 +97,22 @@ export function Header() {
                   {link.label}
                 </SheetClose>
               ))}
-              <SheetClose
-                render={
-                  <Link
-                    href="/contacto"
-                    className={cn(buttonVariants({ variant: "pill", size: "lg" }), "mt-4 justify-center")}
+              <WhatsAppMenu
+                align="center"
+                side="top"
+                sideOffset={10}
+                trigger={
+                  <button
+                    type="button"
+                    className={cn(
+                      buttonVariants({ variant: "pill", size: "lg" }),
+                      "mt-4 justify-center px-7"
+                    )}
                   />
                 }
               >
                 Inscribirse
-              </SheetClose>
+              </WhatsAppMenu>
             </nav>
           </SheetContent>
         </Sheet>
