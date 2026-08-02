@@ -117,6 +117,9 @@ export function Footer() {
                 {link.label}
               </Link>
             ))}
+            <Link href="/admin/login" className="hover:text-white">
+              Admin
+            </Link>
           </nav>
         </div>
       </div>

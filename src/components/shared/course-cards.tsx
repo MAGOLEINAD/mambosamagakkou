@@ -6,8 +6,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
-import { COURSES, type Course } from "@/lib/courses";
-import { whatsappLink } from "@/lib/constants";
+import { COURSES, LANGUAGE_FLAG_ICONS, type Course } from "@/lib/courses";
 import { buttonVariants } from "@/components/ui/button";
 import { StudyPlanDrawer } from "@/components/cursos/study-plan-drawer";
 import { cn } from "@/lib/utils";
@@ -15,6 +14,8 @@ import { cn } from "@/lib/utils";
 const FEATURES = ["Modalidad presencial y virtual", "Adultos y niños", "Todos los niveles"];
 
 function CourseCard({ course, variant }: { course: Course; variant: "link" | "whatsapp" }) {
+  const FlagIcon = LANGUAGE_FLAG_ICONS[course.slug];
+
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-sm transition-shadow hover:shadow-md">
       <div className="relative aspect-[16/10] w-full overflow-hidden">
@@ -34,35 +35,50 @@ function CourseCard({ course, variant }: { course: Course; variant: "link" | "wh
         />
       </div>
 
-      <div className="flex flex-1 flex-col p-7">
-        <h3 className="font-heading text-2xl font-semibold text-ink">{course.name}</h3>
-        <ul className="mt-3 space-y-1 text-base text-ink-soft">
-          {FEATURES.map((feature) => (
-            <li key={feature}>{feature}</li>
-          ))}
-        </ul>
-
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          {variant === "link" ? (
-            <>
-              <Link href="/cursos" className={cn(buttonVariants({ variant: "pill", size: "sm" }))}>
-                Información
-              </Link>
-              <StudyPlanDrawer course={course} trigger="Plan de estudio" />
-            </>
-          ) : (
-            <>
-              <a
-                href={whatsappLink(course.whatsappMessage)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(buttonVariants({ variant: "pill", size: "sm" }))}
-              >
-                Inscribirse
-              </a>
-              <StudyPlanDrawer course={course} trigger="Plan de estudio" />
-            </>
+      <div className="relative flex flex-1 flex-col overflow-hidden p-7">
+        <FlagIcon
+          aria-hidden="true"
+          className={cn(
+            "pointer-events-none absolute -right-6 -bottom-6 w-32 rotate-[-8deg] rounded opacity-[0.12] select-none",
+            course.slug === "japones" && "ring-1 ring-ink/30"
           )}
+        />
+
+        <div className="relative z-10 flex flex-1 flex-col">
+          <h3 className="font-heading text-2xl font-semibold text-ink">{course.name}</h3>
+          <ul className="mt-3 space-y-1 text-base text-ink-soft">
+            {FEATURES.map((feature) => (
+              <li key={feature}>{feature}</li>
+            ))}
+          </ul>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            {variant === "link" ? (
+              <>
+                <Link
+                  href="/cursos"
+                  className={cn(buttonVariants({ variant: "pill", size: "sm" }))}
+                >
+                  Información
+                </Link>
+                <StudyPlanDrawer course={course} trigger="Plan de estudio" />
+              </>
+            ) : (
+              <>
+                <Link
+                  href={{
+                    pathname: "/cursos",
+                    query: { idioma: course.slug },
+                    hash: "cursos-disponibles-ahora",
+                  }}
+                  className={cn(buttonVariants({ variant: "pill", size: "sm" }))}
+                >
+                  Disponibles
+                </Link>
+                <StudyPlanDrawer course={course} trigger="Plan de estudio" />
+              </>
+            )}
+          </div>
         </div>
       </div>
     </article>

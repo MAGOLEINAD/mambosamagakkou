@@ -1,12 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import type { GalleryVideo } from "@/lib/gallery";
 
-function VideoEmbed({ video }: { video: GalleryVideo }) {
+function VideoEmbed({
+  video,
+  interactive = true,
+}: {
+  video: GalleryVideo;
+  interactive?: boolean;
+}) {
+  const [activated, setActivated] = useState(interactive);
+
   return (
     <div className="scroll-mt-24">
       <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-border">
@@ -17,6 +26,18 @@ function VideoEmbed({ video }: { video: GalleryVideo }) {
           allowFullScreen
           className="absolute inset-0 size-full scroll-mt-24"
         />
+        {!activated && (
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label={`Activar reproductor: ${video.title}`}
+            onClick={() => setActivated(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") setActivated(true);
+            }}
+            className="absolute inset-0"
+          />
+        )}
       </div>
       <p className="mt-3 text-center font-heading text-base font-semibold text-ink">
         {video.title}
@@ -39,7 +60,7 @@ export function VideoGallery({ videos }: { videos: GalleryVideo[] }) {
         >
           {videos.map((video) => (
             <SwiperSlide key={video.driveId} className="h-auto pb-1">
-              <VideoEmbed video={video} />
+              <VideoEmbed video={video} interactive={false} />
             </SwiperSlide>
           ))}
         </Swiper>

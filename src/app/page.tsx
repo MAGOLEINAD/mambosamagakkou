@@ -18,7 +18,7 @@ export default function Home() {
     <>
       <Hero />
 
-      <section className="py-16 sm:py-20">
+      <section id="cursos-disponibles" className="scroll-mt-24 py-16 sm:py-20">
         <Container>
           <SectionHeading
             eyebrow="Nuestra oferta"

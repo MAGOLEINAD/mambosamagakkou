@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,11 +15,17 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { WhatsAppMenu } from "@/components/shared/whatsapp-menu";
+import { checkAdminSession } from "@/lib/auth/actions";
 import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export function Header() {
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    checkAdminSession().then(setIsAdmin);
+  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-paper/95 backdrop-blur supports-backdrop-filter:bg-paper/80">
@@ -54,22 +61,31 @@ export function Header() {
           })}
         </nav>
 
-        <WhatsAppMenu
-          align="end"
-          side="bottom"
-          sideOffset={10}
-          trigger={
-            <button
-              type="button"
-              className={cn(
-                buttonVariants({ variant: "pill", size: "lg" }),
-                "hidden px-7 md:inline-flex"
-              )}
-            />
-          }
-        >
-          Inscribirse
-        </WhatsAppMenu>
+        {isAdmin ? (
+          <Link
+            href="/admin/cursos"
+            className={cn(buttonVariants({ variant: "pill", size: "lg" }), "hidden px-7 md:inline-flex")}
+          >
+            Admin
+          </Link>
+        ) : (
+          <WhatsAppMenu
+            align="end"
+            side="bottom"
+            sideOffset={10}
+            trigger={
+              <button
+                type="button"
+                className={cn(
+                  buttonVariants({ variant: "pill", size: "lg" }),
+                  "hidden px-7 md:inline-flex"
+                )}
+              />
+            }
+          >
+            Inscribirse
+          </WhatsAppMenu>
+        )}
 
         <Sheet>
           <SheetTrigger
@@ -97,22 +113,38 @@ export function Header() {
                   {link.label}
                 </SheetClose>
               ))}
-              <WhatsAppMenu
-                align="center"
-                side="top"
-                sideOffset={10}
-                trigger={
-                  <button
-                    type="button"
-                    className={cn(
-                      buttonVariants({ variant: "pill", size: "lg" }),
-                      "mt-4 justify-center px-7"
-                    )}
-                  />
-                }
-              >
-                Inscribirse
-              </WhatsAppMenu>
+              {isAdmin ? (
+                <SheetClose
+                  render={
+                    <Link
+                      href="/admin/cursos"
+                      className={cn(
+                        buttonVariants({ variant: "pill", size: "lg" }),
+                        "mt-4 justify-center px-7"
+                      )}
+                    />
+                  }
+                >
+                  Admin
+                </SheetClose>
+              ) : (
+                <WhatsAppMenu
+                  align="center"
+                  side="top"
+                  sideOffset={10}
+                  trigger={
+                    <button
+                      type="button"
+                      className={cn(
+                        buttonVariants({ variant: "pill", size: "lg" }),
+                        "mt-4 justify-center px-7"
+                      )}
+                    />
+                  }
+                >
+                  Inscribirse
+                </WhatsAppMenu>
+              )}
             </nav>
           </SheetContent>
         </Sheet>

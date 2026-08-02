@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { BrushUnderline } from "@/components/motifs/brush-underline";
@@ -5,6 +7,13 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function Hero() {
+  const scrollToCourses = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    document
+      .getElementById("cursos-disponibles")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <section className="relative flex min-h-[65vh] items-end justify-center overflow-hidden pt-24 pb-16 sm:min-h-[80vh] sm:pb-24">
       <Image
@@ -29,7 +38,8 @@ export function Hero() {
           Cursos de Japonés, Coreano y Chino Mandarín
         </h1>
         <Link
-          href="/cursos"
+          href="#cursos-disponibles"
+          onClick={scrollToCourses}
           className={cn(buttonVariants({ variant: "pill", size: "xl" }), "mt-8 inline-flex")}
         >
           Más información

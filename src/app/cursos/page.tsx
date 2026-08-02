@@ -4,8 +4,11 @@ import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { CourseCards } from "@/components/shared/course-cards";
 import { BeneficiosList } from "@/components/cursos/beneficios-list";
+import { CourseOfferingsSection } from "@/components/cursos/course-offerings-section";
 import { ModalidadSection } from "@/components/shared/modalidad-section";
 import { PageHeader } from "@/components/layout/page-header";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = buildMetadata({
   title: "Cursos",
@@ -30,6 +33,8 @@ export default function CursosPage() {
           <CourseCards variant="whatsapp" />
         </Container>
       </section>
+
+      <CourseOfferingsSection />
 
       <section className="bg-white py-16 sm:py-20">
         <Container>

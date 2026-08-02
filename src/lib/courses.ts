@@ -1,4 +1,24 @@
+import type { ComponentType } from "react";
+import JP from "country-flag-icons/react/3x2/JP";
+import KR from "country-flag-icons/react/3x2/KR";
+import CN from "country-flag-icons/react/3x2/CN";
+
 export type CourseSlug = "japones" | "coreano" | "chino-mandarin";
+
+export const LANGUAGE_LABELS: Record<CourseSlug, string> = {
+  japones: "Japonés",
+  coreano: "Coreano",
+  "chino-mandarin": "Chino Mandarín",
+};
+
+type FlagIconProps = { className?: string; "aria-hidden"?: boolean | "true" | "false" };
+
+/** Real flag SVGs — emoji flags don't render as images on Windows (fallback to "JP"/"KR"/"CN" text). */
+export const LANGUAGE_FLAG_ICONS: Record<CourseSlug, ComponentType<FlagIconProps>> = {
+  japones: JP,
+  coreano: KR,
+  "chino-mandarin": CN,
+};
 
 export type Course = {
   slug: CourseSlug;

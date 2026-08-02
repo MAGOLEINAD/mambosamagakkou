@@ -5,7 +5,7 @@ export const SITE_DESCRIPTION =
   "Academia de idiomas orientales en Buenos Aires. Cursos de Japonés, Coreano y Chino Mandarín para adultos y niños, en modalidad presencial y virtual, todos los niveles.";
 
 export const ADDRESS = "Espacio Delfos, Azcuénaga 714, C1029 CABA";
-export const EMAIL = "info@mambosamagakkou.com";
+export const EMAIL = "mambosamagakkoupage@gmail.com";
 export const PHONE_DISPLAY = "+549 11 6656-3747";
 export const WHATSAPP_NUMBER = "5491166563747";
 
