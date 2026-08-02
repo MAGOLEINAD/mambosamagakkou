@@ -9,7 +9,7 @@ import type { GalleryVideo } from "@/lib/gallery";
 function VideoEmbed({ video }: { video: GalleryVideo }) {
   return (
     <div className="scroll-mt-24">
-      <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl border border-border">
+      <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-border">
         <iframe
           src={`https://drive.google.com/file/d/${video.driveId}/preview`}
           title={video.title}
