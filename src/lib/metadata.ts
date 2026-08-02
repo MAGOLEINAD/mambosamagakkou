@@ -5,7 +5,7 @@ export const siteConfig = {
   name: SITE_NAME,
   url: SITE_URL,
   description: SITE_DESCRIPTION,
-  ogImage: "/images/curso-chino-mandarin.jpg",
+  ogImage: "/images/hero-home.jpg",
 };
 
 export function buildMetadata({
@@ -33,7 +33,14 @@ export function buildMetadata({
       siteName: siteConfig.name,
       locale: "es_AR",
       type: "website",
-      images: [{ url: siteConfig.ogImage }],
+      images: [
+        {
+          url: siteConfig.ogImage,
+          width: 2200,
+          height: 1088,
+          alt: siteConfig.name,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
