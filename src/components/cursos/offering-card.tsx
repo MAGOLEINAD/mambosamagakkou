@@ -14,12 +14,12 @@ import { getCourse, LANGUAGE_FLAG_ICONS } from "@/lib/courses";
 import { whatsappLink } from "@/lib/constants";
 import { buttonVariants } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn, formatCurrency, formatStartDate } from "@/lib/utils";
 import {
   LEVEL_FLAGS,
@@ -119,16 +119,20 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
         {price && <p className="mt-3 text-sm font-semibold text-ink">{price}</p>}
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
-          <Dialog>
-            <DialogTrigger
+          <Sheet>
+            <SheetTrigger
               className={cn(buttonVariants({ variant: "pill-outline", size: "sm" }))}
             >
               Ver más detalles
-            </DialogTrigger>
-            <DialogContent className="max-h-[85vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>{offering.title}</DialogTitle>
-              </DialogHeader>
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              className="w-full overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:max-w-xl"
+            >
+              <SheetHeader>
+                <SheetTitle>{offering.title}</SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 space-y-4 px-4 pb-6">
               <Badges offering={offering} />
 
               <ul className="mt-2 space-y-1.5 text-sm text-ink-soft">
@@ -221,8 +225,9 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
                 <MessageCircle className="size-4" aria-hidden="true" />
                 Inscribirse
               </a>
-            </DialogContent>
-          </Dialog>
+              </div>
+            </SheetContent>
+          </Sheet>
 
           <a
             href={whatsappLink(message)}

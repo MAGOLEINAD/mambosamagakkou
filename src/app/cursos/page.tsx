@@ -9,6 +9,7 @@ import { ModalidadSection } from "@/components/shared/modalidad-section";
 import { PageHeader } from "@/components/layout/page-header";
 
 export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildMetadata({
   title: "Cursos",
