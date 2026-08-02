@@ -13,10 +13,14 @@ export const HOURS = [
   { days: "Sábados", time: "10 a 19 hs" },
 ];
 
+export const INSTAGRAM_URL = "https://www.instagram.com/mambosama_gakkou/";
+export const FACEBOOK_URL = "https://www.facebook.com/idiomasmambosama/";
+
 export const NAV_LINKS = [
   { href: "/", label: "Inicio" },
   { href: "/nosotros", label: "Nosotros" },
   { href: "/cursos", label: "Cursos" },
+  { href: "/fotos-y-videos", label: "Fotos" },
   { href: "/contacto", label: "Contacto" },
 ];
 

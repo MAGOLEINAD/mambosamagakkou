@@ -1,8 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
 import { BrushUnderline } from "@/components/motifs/brush-underline";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { FaqModal } from "@/components/home/faq-modal";
 
 export function NosotrosTeaser() {
   return (
@@ -24,15 +22,7 @@ export function NosotrosTeaser() {
           virtuales de Japonés. Con el tiempo, expandimos nuestra oferta a otros idiomas
           orientales, como Coreano y Chino Mandarín…
         </p>
-        <Link
-          href="/nosotros"
-          className={cn(
-            buttonVariants({ variant: "pill-outline", size: "lg" }),
-            "mt-8 inline-flex border-white text-white hover:bg-white hover:text-ink"
-          )}
-        >
-          Conocé más
-        </Link>
+        <FaqModal triggerClassName="border-white text-white hover:bg-white hover:text-ink" />
       </div>
     </section>
   );

@@ -31,7 +31,7 @@ export default function ContactoPage() {
       <section className="py-16 sm:py-20">
         <Container>
           <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl bg-ink text-white shadow-xl">
-            <DragonMotif className="pointer-events-none absolute -right-14 -bottom-14 h-auto w-80 scale-x-[-1] text-gold/[0.1]" />
+            <DragonMotif className="pointer-events-none absolute -right-14 -bottom-14 h-auto w-80 scale-x-[-1] text-gold/10" />
 
             <div className="relative grid gap-10 p-10 sm:grid-cols-2 sm:p-14">
               <div className="flex flex-col items-start justify-center border-b border-white/10 pb-10 sm:border-b-0 sm:border-r sm:pr-10 sm:pb-0">

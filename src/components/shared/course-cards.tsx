@@ -44,9 +44,12 @@ function CourseCard({ course, variant }: { course: Course; variant: "link" | "wh
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           {variant === "link" ? (
-            <Link href="/cursos" className={cn(buttonVariants({ variant: "pill", size: "sm" }))}>
-              Información
-            </Link>
+            <>
+              <Link href="/cursos" className={cn(buttonVariants({ variant: "pill", size: "sm" }))}>
+                Información
+              </Link>
+              <StudyPlanDrawer course={course} trigger="Plan de estudio" />
+            </>
           ) : (
             <>
               <a

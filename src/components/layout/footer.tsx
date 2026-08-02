@@ -5,10 +5,14 @@ import { usePathname } from "next/navigation";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { DragonMotif } from "@/components/motifs/dragon-motif";
 import { Container } from "@/components/ui/container";
+import { FacebookIcon } from "@/components/icons/facebook-icon";
+import { InstagramIcon } from "@/components/icons/instagram-icon";
 import {
   ADDRESS,
   EMAIL,
+  FACEBOOK_URL,
   HOURS,
+  INSTAGRAM_URL,
   NAV_LINKS,
   PHONE_DISPLAY,
   SITE_NAME,
@@ -75,6 +79,27 @@ export function Footer() {
                   {h.days}: {h.time}
                 </p>
               ))}
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <a
+                href={INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="flex size-9 items-center justify-center rounded-full bg-white/10 text-gold transition-colors hover:bg-white/20"
+              >
+                <InstagramIcon className="size-4.5" />
+              </a>
+              <a
+                href={FACEBOOK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="flex size-9 items-center justify-center rounded-full bg-white/10 text-gold transition-colors hover:bg-white/20"
+              >
+                <FacebookIcon className="size-4.5" />
+              </a>
             </div>
           </div>
         </div>
