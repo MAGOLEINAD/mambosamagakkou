@@ -34,7 +34,7 @@ export default function ContactoPage() {
             <DragonMotif className="pointer-events-none absolute -right-14 -bottom-14 h-auto w-80 scale-x-[-1] text-gold/10" />
 
             <div className="relative grid gap-10 p-10 sm:grid-cols-2 sm:p-14">
-              <div className="flex flex-col items-start justify-center border-b border-white/10 pb-10 sm:border-b-0 sm:border-r sm:pr-10 sm:pb-0">
+              <div className="flex min-w-0 flex-col items-start justify-center border-b border-white/10 pb-10 sm:border-b-0 sm:border-r sm:pr-10 sm:pb-0">
                 <span className="flex size-14 items-center justify-center rounded-full bg-[#25D366]">
                   <WhatsAppIcon className="size-7 text-white" />
                 </span>
@@ -60,7 +60,7 @@ export default function ContactoPage() {
                 </WhatsAppMenu>
               </div>
 
-              <div className="flex flex-col justify-center">
+              <div className="flex min-w-0 flex-col justify-center">
                 <h2 className="font-heading text-2xl font-semibold">Nuestros datos</h2>
                 <BrushUnderline className="mt-3 h-1 w-28 text-brand" />
                 <div className="mt-6">

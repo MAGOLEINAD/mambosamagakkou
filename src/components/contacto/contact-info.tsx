@@ -18,11 +18,14 @@ export function ContactInfo() {
           <div className="min-w-0">
             <p className="text-xs font-bold tracking-wider text-gold uppercase">{label}</p>
             {href ? (
-              <a href={href} className="block text-[15px] font-medium text-white hover:text-white/80">
+              <a
+                href={href}
+                className="block text-[15px] font-medium break-words text-white hover:text-white/80"
+              >
                 {value}
               </a>
             ) : (
-              <p className="text-[15px] font-medium text-white">{value}</p>
+              <p className="text-[15px] font-medium break-words text-white">{value}</p>
             )}
           </div>
         </div>

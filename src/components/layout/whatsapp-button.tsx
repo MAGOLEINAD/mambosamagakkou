@@ -1,9 +1,16 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { WhatsAppIcon } from "@/components/icons/whatsapp-icon";
 import { WhatsAppMenu } from "@/components/shared/whatsapp-menu";
 
 export function WhatsAppButton() {
+  const pathname = usePathname();
+
+  if (pathname === "/contacto") {
+    return null;
+  }
+
   return (
     <WhatsAppMenu
       align="end"
