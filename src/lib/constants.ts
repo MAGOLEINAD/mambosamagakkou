@@ -1,6 +1,6 @@
 export const SITE_NAME = "Mambosamagakkou";
 // TODO: cambiar a "https://mambosamagakkou.com.ar" cuando el dominio propio esté conectado.
-export const SITE_URL = "https://mambosamagakkou.vercel.app";
+export const SITE_URL = "https://www.mambosamagakkou.com.ar";
 export const SITE_DESCRIPTION =
   "Academia de idiomas orientales en Buenos Aires. Cursos de Japonés, Coreano y Chino Mandarín para adultos y niños, en modalidad presencial y virtual, todos los niveles.";
 
