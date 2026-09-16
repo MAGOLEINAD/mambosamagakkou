@@ -108,11 +108,13 @@ function priceBlocks(offering: CourseOffering) {
     }
   }
 
+  // La matrícula se paga SIEMPRE, con cualquier forma de pago, así que va
+  // aparte: metida entre las cuotas mensuales se leía como si solo aplicara a
+  // esa vía, o peor, como un costo que se suma al curso completo.
+  const matricula = offering.tuitionFee ?? null;
+
   // Cuotas mensuales: es otro eje (pagar mes a mes en vez del curso entero).
   const mensual: { label: string; value: string }[] = [];
-  if (offering.tuitionFee) {
-    mensual.push({ label: "Matrícula (pago único)", value: formatCurrency(offering.tuitionFee) });
-  }
   if (offering.monthlyFee) {
     const efectivo = offering.cashMonthlyFee
       ? ` · ${formatCurrency(offering.cashMonthlyFee)} en efectivo`
@@ -128,9 +130,18 @@ function priceBlocks(offering: CourseOffering) {
     });
   }
 
-  const hayAlgo = referencia != null || mensual.length > 0;
+  const hayAlgo = referencia != null || mensual.length > 0 || matricula != null;
 
-  return { referencia, referenciaEsTarjeta, cuotaTarjeta, promos, otros, mensual, hayAlgo };
+  return {
+    referencia,
+    referenciaEsTarjeta,
+    cuotaTarjeta,
+    matricula,
+    promos,
+    otros,
+    mensual,
+    hayAlgo,
+  };
 }
 
 function includesList(offering: CourseOffering) {
@@ -286,6 +297,14 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
                             : "con tarjeta de crédito"}
                         </p>
                       )}
+                      {costos.matricula != null && (
+                        <p className="mt-1.5 text-sm text-ink-soft">
+                          <span className="font-semibold text-ink">
+                            + {formatCurrency(costos.matricula)}
+                          </span>{" "}
+                          de matrícula, pago único con cualquier forma de pago
+                        </p>
+                      )}
                     </div>
                   )}
 
@@ -316,7 +335,38 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
                     </div>
                   )}
 
-                  {(costos.otros.length > 0 || costos.mensual.length > 0) && (
+                  {/* Pagar mes a mes: es una VÍA ALTERNATIVA al curso completo,
+                      no un costo que se suma. De ahí el "O" del título: sin él
+                      se leía como si hubiera que pagar las dos cosas. */}
+                  {(costos.mensual.length > 0 ||
+                    (costos.matricula != null && costos.referencia == null)) && (
+                    <div className="mt-3 rounded-xl border border-border p-3">
+                      <p className="text-xs font-semibold tracking-wide text-ink-soft uppercase">
+                        {costos.referencia != null ? "O pagalo mes a mes" : "Pago mensual"}
+                      </p>
+                      <ul className="mt-2 space-y-1.5 text-sm">
+                        {costos.referencia == null && costos.matricula != null && (
+                          <li className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+                            <span className="text-ink-soft">Matrícula (pago único)</span>
+                            <span className="font-semibold text-ink">
+                              {formatCurrency(costos.matricula)}
+                            </span>
+                          </li>
+                        )}
+                        {costos.mensual.map((row) => (
+                          <li
+                            key={row.label}
+                            className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5"
+                          >
+                            <span className="text-ink-soft">{row.label}</span>
+                            <span className="font-semibold text-ink">{row.value}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {costos.otros.length > 0 && (
                     <ul className="mt-3 space-y-1.5 text-sm">
                       {costos.otros.map((row) => (
                         <li
@@ -327,15 +377,6 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
                           <span className="font-semibold text-ink">
                             {formatCurrency(row.total)}
                           </span>
-                        </li>
-                      ))}
-                      {costos.mensual.map((row) => (
-                        <li
-                          key={row.label}
-                          className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5"
-                        >
-                          <span className="text-ink-soft">{row.label}</span>
-                          <span className="font-semibold text-ink">{row.value}</span>
                         </li>
                       ))}
                     </ul>
