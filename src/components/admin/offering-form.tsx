@@ -725,8 +725,10 @@ export function OfferingForm({
         Todo es opcional: lo que dejes vacío no se muestra en el sitio.
       </p>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
+      {/* La matricula va SOLA y primero: se cobra con cualquier forma de pago.
+          Al lado de "Cuota mensual" se leia como si fuera parte de esa via. */}
+      <div className="rounded-lg border border-border bg-paper/60 p-3">
+        <div className="max-w-[calc(50%-0.5rem)] space-y-1.5">
           <FieldLabel htmlFor="tuitionFee" icon={Wallet}>
             Matrícula
           </FieldLabel>
@@ -741,7 +743,13 @@ export function OfferingForm({
             className={inputClass}
           />
         </div>
+        <p className="mt-2 text-xs text-ink-soft">
+          Pago único. Se cobra siempre, sin importar la forma de pago que elija el alumno:
+          en el sitio aparece aclarado junto al precio del curso.
+        </p>
+      </div>
 
+      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <FieldLabel htmlFor="monthlyFee" icon={Wallet}>
             Cuota mensual
