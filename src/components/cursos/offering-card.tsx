@@ -62,56 +62,75 @@ function priceSummary(offering: CourseOffering) {
   return total ? `Curso completo ${formatCurrency(total)}` : "";
 }
 
-// Detalle de costos del drawer. Cada fila es opcional: la que no tiene dato
-// cargado no existe — nunca "a consultar" ni $ 0.
-function priceRows(offering: CourseOffering) {
-  const rows: { label: string; value: string }[] = [];
+// Costos del drawer, encuadrados comercialmente: el precio con tarjeta es el
+// valor del curso completo (la referencia), y transferencia / efectivo se leen
+// como PROMOS contra ese numero, con el ahorro explicito. Si no hay precio de
+// tarjeta cargado, la referencia pasa a ser el total que haya, y lo que quede
+// por debajo sigue siendo promo.
+//
+// Todo es opcional: lo que no tenga dato no aparece. Nunca "a consultar" ni $ 0.
+type Promo = { label: string; total: number; ahorro: number; porcentaje: number };
 
-  if (offering.tuitionFee) {
-    rows.push({ label: "Matrícula (pago único)", value: formatCurrency(offering.tuitionFee) });
+function priceBlocks(offering: CourseOffering) {
+  const referencia = offering.cardTotal ?? offering.transferTotal ?? offering.cashTotal ?? null;
+  const referenciaEsTarjeta = offering.cardTotal != null;
+
+  // El valor de cada cuota se calcula, no se guarda: asi no se desincroniza
+  // con el total ni con la cantidad.
+  const cuotaTarjeta =
+    offering.cardTotal && offering.cardInstallments
+      ? Math.round(offering.cardTotal / offering.cardInstallments)
+      : null;
+
+  const candidatos: { label: string; total: number | undefined }[] = [
+    { label: "Transferencia", total: offering.transferTotal },
+    { label: "Efectivo", total: offering.cashTotal },
+  ];
+
+  const promos: Promo[] = [];
+  const otros: { label: string; total: number }[] = [];
+
+  for (const c of candidatos) {
+    if (c.total == null) continue;
+    if (referencia == null || c.total === referencia) continue;
+    if (c.total < referencia) {
+      const ahorro = referencia - c.total;
+      promos.push({
+        label: c.label,
+        total: c.total,
+        ahorro,
+        porcentaje: Math.round((ahorro / referencia) * 100),
+      });
+    } else {
+      // Dato raro (un medio mas caro que la referencia): se muestra sin
+      // inventarle un descuento negativo.
+      otros.push({ label: c.label, total: c.total });
+    }
   }
 
+  // Cuotas mensuales: es otro eje (pagar mes a mes en vez del curso entero).
+  const mensual: { label: string; value: string }[] = [];
+  if (offering.tuitionFee) {
+    mensual.push({ label: "Matrícula (pago único)", value: formatCurrency(offering.tuitionFee) });
+  }
   if (offering.monthlyFee) {
     const efectivo = offering.cashMonthlyFee
       ? ` · ${formatCurrency(offering.cashMonthlyFee)} en efectivo`
       : "";
-    rows.push({
+    mensual.push({
       label: "Cuota mensual",
       value: `${formatCurrency(offering.monthlyFee)}/mes${efectivo}`,
     });
   } else if (offering.cashMonthlyFee) {
-    rows.push({
+    mensual.push({
       label: "Cuota mensual en efectivo",
       value: `${formatCurrency(offering.cashMonthlyFee)}/mes`,
     });
   }
 
-  if (offering.transferTotal) {
-    rows.push({
-      label: "Curso completo por transferencia",
-      value: formatCurrency(offering.transferTotal),
-    });
-  }
+  const hayAlgo = referencia != null || mensual.length > 0;
 
-  if (offering.cashTotal) {
-    rows.push({ label: "Curso completo en efectivo", value: formatCurrency(offering.cashTotal) });
-  }
-
-  if (offering.cardTotal) {
-    // El valor de cada cuota se calcula, no se carga: así no se desincroniza
-    // con el total ni con la cantidad.
-    const cuotas = offering.cardInstallments
-      ? ` en ${offering.cardInstallments} cuotas de ${formatCurrency(
-          Math.round(offering.cardTotal / offering.cardInstallments)
-        )}`
-      : "";
-    rows.push({
-      label: "Con tarjeta de crédito",
-      value: `${formatCurrency(offering.cardTotal)}${cuotas}`,
-    });
-  }
-
-  return rows;
+  return { referencia, referenciaEsTarjeta, cuotaTarjeta, promos, otros, mensual, hayAlgo };
 }
 
 function includesList(offering: CourseOffering) {
@@ -119,6 +138,7 @@ function includesList(offering: CourseOffering) {
   if (offering.includes?.certificate) items.push("Certificado oficial");
   if (offering.includes?.recordings) items.push("Grabaciones de las clases");
   if (offering.includes?.whatsappGroup) items.push("Grupo de WhatsApp");
+  if (offering.includes?.campusVirtual) items.push("Campus Virtual");
   if (offering.includes?.materials && offering.includes.materials !== "none") {
     items.push(`Materiales ${MATERIALS_LABELS[offering.includes.materials]}`);
   }
@@ -131,7 +151,7 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
   const message =
     offering.whatsappMessage ?? `Hola! Quisiera información sobre ${offering.title}.`;
   const price = priceSummary(offering);
-  const costos = priceRows(offering);
+  const costos = priceBlocks(offering);
   const includes = includesList(offering);
 
   return (
@@ -243,23 +263,83 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
                 </div>
               )}
 
-              {costos.length > 0 && (
+              {costos.hayAlgo && (
                 <div className="border-t border-border pt-4">
                   <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
                     <Clock3 className="size-4 text-brand" aria-hidden="true" />
                     Costos
                   </p>
-                  <ul className="mt-2 space-y-1.5 text-sm">
-                    {costos.map((row) => (
-                      <li
-                        key={row.label}
-                        className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5"
-                      >
-                        <span className="text-ink-soft">{row.label}</span>
-                        <span className="font-semibold text-ink">{row.value}</span>
-                      </li>
-                    ))}
-                  </ul>
+
+                  {/* Valor del curso completo: el numero de referencia */}
+                  {costos.referencia != null && (
+                    <div className="mt-2">
+                      <p className="text-xs font-medium tracking-wide text-ink-soft uppercase">
+                        Curso completo
+                      </p>
+                      <p className="font-heading text-2xl font-semibold text-ink">
+                        {formatCurrency(costos.referencia)}
+                      </p>
+                      {costos.referenciaEsTarjeta && (
+                        <p className="text-sm text-ink-soft">
+                          {costos.cuotaTarjeta
+                            ? `con tarjeta de crédito, en ${offering.cardInstallments} cuotas de ${formatCurrency(costos.cuotaTarjeta)}`
+                            : "con tarjeta de crédito"}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Los otros medios, como promo contra ese valor */}
+                  {costos.promos.length > 0 && (
+                    <div className="mt-3 rounded-xl border border-brand/20 bg-brand/5 p-3">
+                      <p className="text-xs font-semibold tracking-wide text-brand-dark uppercase">
+                        Pagalo menos por otros medios
+                      </p>
+                      <ul className="mt-2 space-y-2 text-sm">
+                        {costos.promos.map((promo) => (
+                          <li
+                            key={promo.label}
+                            className="flex flex-wrap items-baseline justify-between gap-x-3"
+                          >
+                            <span className="text-ink-soft">{promo.label}</span>
+                            <span className="text-right">
+                              <span className="font-semibold text-ink">
+                                {formatCurrency(promo.total)}
+                              </span>
+                              <span className="block text-xs font-medium text-brand-dark">
+                                ahorrás {formatCurrency(promo.ahorro)} ({promo.porcentaje}%)
+                              </span>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {(costos.otros.length > 0 || costos.mensual.length > 0) && (
+                    <ul className="mt-3 space-y-1.5 text-sm">
+                      {costos.otros.map((row) => (
+                        <li
+                          key={row.label}
+                          className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5"
+                        >
+                          <span className="text-ink-soft">{row.label}</span>
+                          <span className="font-semibold text-ink">
+                            {formatCurrency(row.total)}
+                          </span>
+                        </li>
+                      ))}
+                      {costos.mensual.map((row) => (
+                        <li
+                          key={row.label}
+                          className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5"
+                        >
+                          <span className="text-ink-soft">{row.label}</span>
+                          <span className="font-semibold text-ink">{row.value}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               )}
 

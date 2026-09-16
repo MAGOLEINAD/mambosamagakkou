@@ -30,6 +30,7 @@ function readFormValues(formData: FormData) {
       certificate: formData.get("includes.certificate") === "on",
       recordings: formData.get("includes.recordings") === "on",
       whatsappGroup: formData.get("includes.whatsappGroup") === "on",
+      campusVirtual: formData.get("includes.campusVirtual") === "on",
       materials: formData.get("includes.materials") || "none",
     },
   };
