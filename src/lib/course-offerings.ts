@@ -35,8 +35,23 @@ export const OfferingSchema = z.object({
   ),
   location: z.preprocess(emptyToUndefined, z.string().trim().optional()),
   capacity: z.preprocess(emptyToUndefined, z.coerce.number().int().positive().optional()),
+  // Costos. Todo opcional: lo que no se carga, no se muestra (nunca "a consultar"
+  // ni $0). Mismo modelo que el catálogo del bot de WhatsApp, para que el sitio y
+  // el bot digan lo mismo — pero son bases distintas, los precios se cargan en los
+  // dos lados a mano.
   tuitionFee: z.preprocess(emptyToUndefined, z.coerce.number().nonnegative().optional()),
   monthlyFee: z.preprocess(emptyToUndefined, z.coerce.number().nonnegative().optional()),
+  cashMonthlyFee: z.preprocess(emptyToUndefined, z.coerce.number().nonnegative().optional()),
+  // Precio TOTAL del curso según forma de pago
+  transferTotal: z.preprocess(emptyToUndefined, z.coerce.number().nonnegative().optional()),
+  cashTotal: z.preprocess(emptyToUndefined, z.coerce.number().nonnegative().optional()),
+  cardTotal: z.preprocess(emptyToUndefined, z.coerce.number().nonnegative().optional()),
+  // Cuotas de la financiación con tarjeta (no la cuota mensual del curso). El
+  // valor de cada una no se guarda: se calcula cardTotal / cardInstallments.
+  cardInstallments: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().positive().optional()
+  ),
   details: z.array(z.string().trim().min(1)).default([]),
   whatsappMessage: z.preprocess(emptyToUndefined, z.string().trim().optional()),
   isActive: z.coerce.boolean().default(true),

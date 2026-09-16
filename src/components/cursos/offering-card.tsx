@@ -49,11 +49,69 @@ function Badges({ offering }: { offering: CourseOffering }) {
   );
 }
 
+// Resumen corto para la cara de la card: lo mínimo que engancha. El detalle
+// completo por forma de pago va en el drawer (ver priceRows).
 function priceSummary(offering: CourseOffering) {
   const parts: string[] = [];
   if (offering.tuitionFee) parts.push(`Matrícula ${formatCurrency(offering.tuitionFee)}`);
   if (offering.monthlyFee) parts.push(`Cuota ${formatCurrency(offering.monthlyFee)}/mes`);
-  return parts.join(" + ");
+  if (parts.length > 0) return parts.join(" + ");
+
+  // Cursos que se cobran de una sola vez: no tienen matrícula ni cuota.
+  const total = offering.transferTotal ?? offering.cashTotal ?? offering.cardTotal;
+  return total ? `Curso completo ${formatCurrency(total)}` : "";
+}
+
+// Detalle de costos del drawer. Cada fila es opcional: la que no tiene dato
+// cargado no existe — nunca "a consultar" ni $ 0.
+function priceRows(offering: CourseOffering) {
+  const rows: { label: string; value: string }[] = [];
+
+  if (offering.tuitionFee) {
+    rows.push({ label: "Matrícula (pago único)", value: formatCurrency(offering.tuitionFee) });
+  }
+
+  if (offering.monthlyFee) {
+    const efectivo = offering.cashMonthlyFee
+      ? ` · ${formatCurrency(offering.cashMonthlyFee)} en efectivo`
+      : "";
+    rows.push({
+      label: "Cuota mensual",
+      value: `${formatCurrency(offering.monthlyFee)}/mes${efectivo}`,
+    });
+  } else if (offering.cashMonthlyFee) {
+    rows.push({
+      label: "Cuota mensual en efectivo",
+      value: `${formatCurrency(offering.cashMonthlyFee)}/mes`,
+    });
+  }
+
+  if (offering.transferTotal) {
+    rows.push({
+      label: "Curso completo por transferencia",
+      value: formatCurrency(offering.transferTotal),
+    });
+  }
+
+  if (offering.cashTotal) {
+    rows.push({ label: "Curso completo en efectivo", value: formatCurrency(offering.cashTotal) });
+  }
+
+  if (offering.cardTotal) {
+    // El valor de cada cuota se calcula, no se carga: así no se desincroniza
+    // con el total ni con la cantidad.
+    const cuotas = offering.cardInstallments
+      ? ` en ${offering.cardInstallments} cuotas de ${formatCurrency(
+          Math.round(offering.cardTotal / offering.cardInstallments)
+        )}`
+      : "";
+    rows.push({
+      label: "Con tarjeta de crédito",
+      value: `${formatCurrency(offering.cardTotal)}${cuotas}`,
+    });
+  }
+
+  return rows;
 }
 
 function includesList(offering: CourseOffering) {
@@ -73,6 +131,7 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
   const message =
     offering.whatsappMessage ?? `Hola! Quisiera información sobre ${offering.title}.`;
   const price = priceSummary(offering);
+  const costos = priceRows(offering);
   const includes = includesList(offering);
 
   return (
@@ -184,13 +243,23 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
                 </div>
               )}
 
-              {price && (
+              {costos.length > 0 && (
                 <div className="border-t border-border pt-4">
                   <p className="flex items-center gap-1.5 text-sm font-semibold text-ink">
                     <Clock3 className="size-4 text-brand" aria-hidden="true" />
                     Costos
                   </p>
-                  <p className="mt-1 text-sm text-ink-soft">{price}</p>
+                  <ul className="mt-2 space-y-1.5 text-sm">
+                    {costos.map((row) => (
+                      <li
+                        key={row.label}
+                        className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5"
+                      >
+                        <span className="text-ink-soft">{row.label}</span>
+                        <span className="font-semibold text-ink">{row.value}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
 

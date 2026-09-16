@@ -29,13 +29,17 @@ import {
   Eye,
   Link2,
   Wallet,
+  Landmark,
+  Banknote,
+  CreditCard,
+  Hash,
   ChevronDown,
 } from "lucide-react";
 import type { CourseOffering, OfferingLevel } from "@/lib/course-offerings";
 import { LANGUAGE_LABELS, type CourseSlug } from "@/lib/courses";
 import { ALL_LEVELS, LEVEL_LABELS, LEVEL_FLAGS, MODALITY_FLAGS } from "@/lib/offering-display";
 import type { OfferingFormState } from "@/app/admin/(protected)/cursos/actions";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { OfferingDetailRowsInput } from "@/components/admin/offering-detail-rows-input";
 import { DatePickerField } from "@/components/admin/date-picker-field";
@@ -117,6 +121,11 @@ type FormValues = {
   location: string;
   tuitionFee: string;
   monthlyFee: string;
+  cashMonthlyFee: string;
+  transferTotal: string;
+  cashTotal: string;
+  cardTotal: string;
+  cardInstallments: string;
   whatsappMessage: string;
   order: string;
   isActive: boolean;
@@ -142,6 +151,12 @@ function initialValues(offering?: CourseOffering): FormValues {
     location: offering?.location ?? "",
     tuitionFee: offering?.tuitionFee != null ? String(offering.tuitionFee) : "",
     monthlyFee: offering?.monthlyFee != null ? String(offering.monthlyFee) : "",
+    cashMonthlyFee: offering?.cashMonthlyFee != null ? String(offering.cashMonthlyFee) : "",
+    transferTotal: offering?.transferTotal != null ? String(offering.transferTotal) : "",
+    cashTotal: offering?.cashTotal != null ? String(offering.cashTotal) : "",
+    cardTotal: offering?.cardTotal != null ? String(offering.cardTotal) : "",
+    cardInstallments:
+      offering?.cardInstallments != null ? String(offering.cardInstallments) : "",
     whatsappMessage: offering?.whatsappMessage ?? "",
     order: offering?.order != null ? String(offering.order) : "0",
     isActive: offering?.isActive ?? true,
@@ -180,6 +195,15 @@ export function OfferingForm({
   function updateField<K extends keyof FormValues>(key: K, value: FormValues[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
   }
+
+  // Valor de cada cuota de tarjeta: derivado, nunca se guarda, así no puede
+  // quedar desincronizado con el total ni con la cantidad de cuotas.
+  const totalTarjeta = Number(values.cardTotal);
+  const cantidadCuotas = Number(values.cardInstallments);
+  const cuotaTarjeta =
+    totalTarjeta > 0 && cantidadCuotas > 0
+      ? formatCurrency(Math.round(totalTarjeta / cantidadCuotas))
+      : null;
 
   function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -532,6 +556,10 @@ export function OfferingForm({
 
       <SectionHeading>Costos (opcional)</SectionHeading>
 
+      <p className="-mt-2 text-sm text-ink-soft">
+        Todo es opcional: lo que dejes vacío no se muestra en el sitio.
+      </p>
+
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <FieldLabel htmlFor="tuitionFee" icon={Wallet}>
@@ -563,6 +591,100 @@ export function OfferingForm({
             placeholder="Ej: 55000"
             className={inputClass}
           />
+        </div>
+
+        <div className="space-y-1.5">
+          <FieldLabel htmlFor="cashMonthlyFee" icon={Banknote}>
+            Cuota mensual en efectivo
+          </FieldLabel>
+          <input
+            id="cashMonthlyFee"
+            name="cashMonthlyFee"
+            type="number"
+            min={0}
+            value={values.cashMonthlyFee}
+            onChange={(e) => updateField("cashMonthlyFee", e.target.value)}
+            placeholder="Ej: 50000"
+            className={inputClass}
+          />
+          <p className="text-xs text-ink-soft">Solo si es distinta a la de arriba.</p>
+        </div>
+      </div>
+
+      {/* Precio total del curso según forma de pago */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <FieldLabel htmlFor="transferTotal" icon={Landmark}>
+            Curso completo por transferencia
+          </FieldLabel>
+          <input
+            id="transferTotal"
+            name="transferTotal"
+            type="number"
+            min={0}
+            value={values.transferTotal}
+            onChange={(e) => updateField("transferTotal", e.target.value)}
+            placeholder="Ej: 250000"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <FieldLabel htmlFor="cashTotal" icon={Banknote}>
+            Curso completo en efectivo
+          </FieldLabel>
+          <input
+            id="cashTotal"
+            name="cashTotal"
+            type="number"
+            min={0}
+            value={values.cashTotal}
+            onChange={(e) => updateField("cashTotal", e.target.value)}
+            placeholder="Ej: 240000"
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <FieldLabel htmlFor="cardTotal" icon={CreditCard}>
+            Curso completo con tarjeta
+          </FieldLabel>
+          <input
+            id="cardTotal"
+            name="cardTotal"
+            type="number"
+            min={0}
+            value={values.cardTotal}
+            onChange={(e) => updateField("cardTotal", e.target.value)}
+            placeholder="Ej: 290000"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <FieldLabel htmlFor="cardInstallments" icon={Hash}>
+            Cantidad de cuotas
+          </FieldLabel>
+          <input
+            id="cardInstallments"
+            name="cardInstallments"
+            type="number"
+            min={1}
+            step={1}
+            value={values.cardInstallments}
+            onChange={(e) => updateField("cardInstallments", e.target.value)}
+            placeholder="Ej: 3"
+            className={inputClass}
+          />
+          {/* El valor de cada cuota no se guarda: se calcula al mostrarlo */}
+          {cuotaTarjeta && (
+            <p className="text-xs text-ink-soft">
+              Queda en {values.cardInstallments} cuotas de{" "}
+              <span className="font-semibold text-ink">{cuotaTarjeta}</span>
+            </p>
+          )}
         </div>
       </div>
 
