@@ -23,6 +23,7 @@ export const OfferingSchema = z.object({
     certificate: z.coerce.boolean().default(false),
     recordings: z.coerce.boolean().default(false),
     whatsappGroup: z.coerce.boolean().default(false),
+    campusVirtual: z.coerce.boolean().default(false),
     materials: z.enum(MATERIALS).default("none"),
   }),
   schedule: z.string().trim().min(1, "Indicá el día y horario."),

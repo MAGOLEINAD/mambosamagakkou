@@ -28,6 +28,7 @@ import {
   ArrowUpDown,
   Eye,
   Link2,
+  GraduationCap,
   Wallet,
   Landmark,
   Banknote,
@@ -111,6 +112,7 @@ type FormValues = {
   includesCertificate: boolean;
   includesRecordings: boolean;
   includesWhatsappGroup: boolean;
+  includesCampusVirtual: boolean;
   includesMaterials: MaterialsOption;
   schedule: string;
   classDuration: string;
@@ -141,6 +143,7 @@ function initialValues(offering?: CourseOffering): FormValues {
     includesCertificate: offering?.includes?.certificate ?? false,
     includesRecordings: offering?.includes?.recordings ?? false,
     includesWhatsappGroup: offering?.includes?.whatsappGroup ?? false,
+    includesCampusVirtual: offering?.includes?.campusVirtual ?? false,
     includesMaterials: offering?.includes?.materials ?? "none",
     schedule: offering?.schedule ?? "",
     classDuration: offering?.classDuration ?? "",
@@ -416,6 +419,18 @@ export function OfferingForm({
           />
           <MessageCircle className="size-4 text-brand" aria-hidden="true" />
           Grupo de WhatsApp
+        </label>
+
+        <label className="flex items-center gap-2 text-sm text-ink">
+          <input
+            type="checkbox"
+            name="includes.campusVirtual"
+            checked={values.includesCampusVirtual}
+            onChange={(e) => updateField("includesCampusVirtual", e.target.checked)}
+            className="size-4 rounded border-border"
+          />
+          <GraduationCap className="size-4 text-brand" aria-hidden="true" />
+          Campus Virtual
         </label>
 
         <div>
