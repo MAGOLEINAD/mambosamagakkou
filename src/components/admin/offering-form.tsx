@@ -95,11 +95,62 @@ function FieldLabel({
   );
 }
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
+type SeccionId = "basica" | "incluye" | "horarios" | "costos" | "otros";
+
+/**
+ * Sección plegable del formulario.
+ *
+ * OJO: el contenido se OCULTA con CSS, no se desmonta. El submit arma el body
+ * con `new FormData(form)`, así que un input desmontado no viajaría y los
+ * campos obligatorios de una sección cerrada harían fallar la validación.
+ *
+ * El `data-section` lo usa el efecto de errores para abrir sola la sección
+ * donde vive el campo que falta, sin tener que mantener un mapa a mano.
+ */
+function FormSection({
+  id,
+  titulo,
+  abierta,
+  onToggle,
+  children,
+}: {
+  id: SeccionId;
+  titulo: string;
+  abierta: boolean;
+  onToggle: (abierta: boolean) => void;
+  children: React.ReactNode;
+}) {
   return (
-    <h3 className="border-t border-border pt-6 font-heading text-lg font-semibold text-ink first:border-t-0 first:pt-0">
-      {children}
-    </h3>
+    <section data-section={id} className="overflow-hidden rounded-xl border border-border">
+      <button
+        type="button"
+        onClick={() => onToggle(!abierta)}
+        aria-expanded={abierta}
+        className={cn(
+          "flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors",
+          abierta ? "bg-brand/5 hover:bg-brand/10" : "hover:bg-paper"
+        )}
+      >
+        <span
+          className={cn(
+            "font-heading text-base font-semibold",
+            abierta ? "text-brand-dark" : "text-ink"
+          )}
+        >
+          {titulo}
+        </span>
+        <ChevronDown
+          className={cn(
+            "size-4 shrink-0 transition-transform",
+            abierta ? "rotate-180 text-brand" : "text-ink-soft"
+          )}
+          aria-hidden="true"
+        />
+      </button>
+      <div className={cn("space-y-6 border-t border-border px-4 py-4", !abierta && "hidden")}>
+        {children}
+      </div>
+    </section>
   );
 }
 
@@ -182,17 +233,50 @@ export function OfferingForm({
     offering?.imageUrl ?? null
   );
 
+  // Al crear un curso hay que llenar todo, así que arranca abierta la primera.
+  // Al editar uno existente, todo cerrado: casi siempre se viene a tocar una
+  // sola cosa y el formulario es largo.
+  const [abiertas, setAbiertas] = useState<Record<SeccionId, boolean>>(() => ({
+    basica: !offering,
+    incluye: false,
+    horarios: false,
+    costos: false,
+    otros: false,
+  }));
+
+  const toggleSeccion = (seccion: SeccionId) => (abierta: boolean) =>
+    setAbiertas((prev) => ({ ...prev, [seccion]: abierta }));
+
+  const todoAbierto = Object.values(abiertas).every(Boolean);
+  const alternarTodo = () =>
+    setAbiertas({
+      basica: !todoAbierto,
+      incluye: !todoAbierto,
+      horarios: !todoAbierto,
+      costos: !todoAbierto,
+      otros: !todoAbierto,
+    });
+
   useEffect(() => {
     if (state?.success) {
       onSuccess?.();
       return;
     }
     const firstErrorField = state?.errors ? Object.keys(state.errors)[0] : undefined;
-    if (firstErrorField) {
-      document
-        .getElementById(firstErrorField)
-        ?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    if (!firstErrorField) return;
+
+    // La sección del campo que falta se abre sola: si queda cerrada, el usuario
+    // no ve qué tiene mal. El scroll va a la SECCIÓN y no al campo, porque un
+    // campo oculto con display:none no tiene caja y scrollIntoView no hace nada.
+    requestAnimationFrame(() => {
+      const campo = document.getElementById(firstErrorField);
+      const seccionEl = campo?.closest<HTMLElement>("[data-section]");
+      const seccion = seccionEl?.dataset.section as SeccionId | undefined;
+      if (seccion) {
+        setAbiertas((prev) => ({ ...prev, [seccion]: true }));
+      }
+      (seccionEl ?? campo)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
   }, [state, onSuccess]);
 
   function updateField<K extends keyof FormValues>(key: K, value: FormValues[K]) {
@@ -236,8 +320,23 @@ export function OfferingForm({
     "w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-ink outline-none focus-visible:border-brand focus-visible:ring-3 focus-visible:ring-brand/20";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <SectionHeading>Información básica</SectionHeading>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={alternarTodo}
+          className="text-sm font-medium text-brand hover:text-brand-dark hover:underline"
+        >
+          {todoAbierto ? "Contraer todo" : "Expandir todo"}
+        </button>
+      </div>
+
+      <FormSection
+        id="basica"
+        titulo="Información básica"
+        abierta={abiertas.basica}
+        onToggle={toggleSeccion('basica')}
+      >
 
       <div className="space-y-1.5">
         <FieldLabel htmlFor="title" icon={Heading}>
@@ -382,7 +481,14 @@ export function OfferingForm({
         />
       </div>
 
-      <SectionHeading>Incluye (opcional)</SectionHeading>
+      </FormSection>
+
+      <FormSection
+        id="incluye"
+        titulo="Incluye (opcional)"
+        abierta={abiertas.incluye}
+        onToggle={toggleSeccion('incluye')}
+      >
 
       <div className="grid grid-cols-2 gap-3">
         <label className="flex items-center gap-2 text-sm text-ink">
@@ -476,7 +582,14 @@ export function OfferingForm({
         </div>
       </div>
 
-      <SectionHeading>Horarios y duración</SectionHeading>
+      </FormSection>
+
+      <FormSection
+        id="horarios"
+        titulo="Horarios y duración"
+        abierta={abiertas.horarios}
+        onToggle={toggleSeccion('horarios')}
+      >
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
@@ -569,7 +682,14 @@ export function OfferingForm({
         )}
       </div>
 
-      <SectionHeading>Costos (opcional)</SectionHeading>
+      </FormSection>
+
+      <FormSection
+        id="costos"
+        titulo="Costos (opcional)"
+        abierta={abiertas.costos}
+        onToggle={toggleSeccion('costos')}
+      >
 
       <p className="-mt-2 text-sm text-ink-soft">
         Todo es opcional: lo que dejes vacío no se muestra en el sitio.
@@ -676,6 +796,11 @@ export function OfferingForm({
             placeholder="Ej: 290000"
             className={inputClass}
           />
+          <p className="text-xs text-ink-soft">
+            Es el valor de referencia del curso: en el sitio se muestra primero y
+            en grande, y transferencia y efectivo aparecen debajo como descuentos
+            calculados sobre este número.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -703,7 +828,14 @@ export function OfferingForm({
         </div>
       </div>
 
-      <SectionHeading>Otros</SectionHeading>
+      </FormSection>
+
+      <FormSection
+        id="otros"
+        titulo="Otros"
+        abierta={abiertas.otros}
+        onToggle={toggleSeccion('otros')}
+      >
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
@@ -813,6 +945,8 @@ export function OfferingForm({
         <Eye className="size-4 text-brand" aria-hidden="true" />
         Activa (visible en /cursos)
       </label>
+
+      </FormSection>
 
       {state?.message && <p className="text-sm text-destructive">{state.message}</p>}
 
