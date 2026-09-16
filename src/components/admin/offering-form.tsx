@@ -35,12 +35,19 @@ import {
   CreditCard,
   Hash,
   ChevronDown,
+  Info,
 } from "lucide-react";
 import type { CourseOffering, OfferingLevel } from "@/lib/course-offerings";
 import { LANGUAGE_LABELS, type CourseSlug } from "@/lib/courses";
 import { ALL_LEVELS, LEVEL_LABELS, LEVEL_FLAGS, MODALITY_FLAGS } from "@/lib/offering-display";
 import type { OfferingFormState } from "@/app/admin/(protected)/cursos/actions";
 import { cn, formatCurrency } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { OfferingDetailRowsInput } from "@/components/admin/offering-detail-rows-input";
 import { DatePickerField } from "@/components/admin/date-picker-field";
@@ -92,6 +99,29 @@ function FieldLabel({
       <Icon className="size-4 text-brand" aria-hidden="true" />
       {children}
     </label>
+  );
+}
+
+// (i) con una aclaración corta. El texto largo al pie del campo ensuciaba el
+// formulario: la explicación está para quien la busca, no para leerla siempre.
+function InfoTip({ children }: { children: React.ReactNode }) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <button
+              type="button"
+              aria-label="Más información"
+              className="inline-flex text-ink-soft/70 transition-colors hover:text-brand"
+            />
+          }
+        >
+          <Info className="size-3.5" aria-hidden="true" />
+        </TooltipTrigger>
+        <TooltipContent>{children}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
@@ -783,9 +813,16 @@ export function OfferingForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <FieldLabel htmlFor="cardTotal" icon={CreditCard}>
-            Curso completo con tarjeta
-          </FieldLabel>
+          <div className="flex items-center gap-1.5">
+            <FieldLabel htmlFor="cardTotal" icon={CreditCard}>
+              Curso completo con tarjeta
+            </FieldLabel>
+            <InfoTip>
+              Es el valor de referencia del curso. En el sitio se muestra primero y en
+              grande, y transferencia y efectivo aparecen debajo como descuentos
+              calculados sobre este número.
+            </InfoTip>
+          </div>
           <input
             id="cardTotal"
             name="cardTotal"
@@ -796,11 +833,6 @@ export function OfferingForm({
             placeholder="Ej: 290000"
             className={inputClass}
           />
-          <p className="text-xs text-ink-soft">
-            Es el valor de referencia del curso: en el sitio se muestra primero y
-            en grande, y transferencia y efectivo aparecen debajo como descuentos
-            calculados sobre este número.
-          </p>
         </div>
 
         <div className="space-y-1.5">
