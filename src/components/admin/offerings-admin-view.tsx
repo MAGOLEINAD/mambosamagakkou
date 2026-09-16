@@ -6,12 +6,21 @@ import type { CourseOffering } from "@/lib/course-offerings";
 import { createAction, updateAction } from "@/app/admin/(protected)/cursos/actions";
 import { OfferingList } from "@/components/admin/offering-list";
 import { OfferingForm } from "@/components/admin/offering-form";
+import {
+  OfferingsFilters,
+  filtrarOfferings,
+  FILTROS_VACIOS,
+  type OfferingFilters,
+} from "@/components/admin/offerings-filters";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export function OfferingsAdminView({ offerings }: { offerings: CourseOffering[] }) {
   const [createOpen, setCreateOpen] = useState(false);
   const [editingOffering, setEditingOffering] = useState<CourseOffering | null>(null);
+  const [filtros, setFiltros] = useState<OfferingFilters>(FILTROS_VACIOS);
+
+  const visibles = filtrarOfferings(offerings, filtros);
 
   return (
     <div>
@@ -28,8 +37,27 @@ export function OfferingsAdminView({ offerings }: { offerings: CourseOffering[] 
         </Button>
       </div>
 
-      <div className="mt-8">
-        <OfferingList offerings={offerings} onEdit={setEditingOffering} />
+      {/* Los filtros solo aparecen cuando hay lista que filtrar: con dos cursos
+          cargados son ruido, y en el estado vacío no tienen nada que hacer. */}
+      {offerings.length > 3 && (
+        <div className="mt-8">
+          <OfferingsFilters
+            filtros={filtros}
+            onChange={setFiltros}
+            total={offerings.length}
+            visibles={visibles.length}
+          />
+        </div>
+      )}
+
+      <div className="mt-6">
+        {offerings.length > 0 && visibles.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-border bg-white p-8 text-center text-sm text-ink-soft">
+            Ningún curso coincide con los filtros.
+          </p>
+        ) : (
+          <OfferingList offerings={visibles} onEdit={setEditingOffering} />
+        )}
       </div>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
