@@ -49,17 +49,41 @@ function Badges({ offering }: { offering: CourseOffering }) {
   );
 }
 
-// Resumen corto para la cara de la card: lo mínimo que engancha. El detalle
-// completo por forma de pago va en el drawer (ver priceRows).
+// Gancho de la cara de la card: el precio MAS BARATO al que se puede acceder al
+// curso, con "desde". El detalle completo por forma de pago va en el drawer.
+//
+// Se compara entre totales, o entre mensuales si el curso no tiene totales
+// cargados: mezclar un total con una cuota daria un "desde" mentiroso.
 function priceSummary(offering: CourseOffering) {
-  const parts: string[] = [];
-  if (offering.tuitionFee) parts.push(`Matrícula ${formatCurrency(offering.tuitionFee)}`);
-  if (offering.monthlyFee) parts.push(`Cuota ${formatCurrency(offering.monthlyFee)}/mes`);
-  if (parts.length > 0) return parts.join(" + ");
+  const totales = [
+    { monto: offering.cashTotal, detalle: "el curso completo en efectivo" },
+    { monto: offering.transferTotal, detalle: "el curso completo por transferencia" },
+    { monto: offering.cardTotal, detalle: "el curso completo con tarjeta" },
+  ].filter((o): o is { monto: number; detalle: string } => o.monto != null);
 
-  // Cursos que se cobran de una sola vez: no tienen matrícula ni cuota.
-  const total = offering.transferTotal ?? offering.cashTotal ?? offering.cardTotal;
-  return total ? `Curso completo ${formatCurrency(total)}` : "";
+  const mensuales = [
+    { monto: offering.cashMonthlyFee, detalle: "por mes, en efectivo" },
+    { monto: offering.monthlyFee, detalle: "por mes" },
+  ].filter((o): o is { monto: number; detalle: string } => o.monto != null);
+
+  const opciones = totales.length > 0 ? totales : mensuales;
+  if (opciones.length === 0) {
+    // Solo matricula cargada: raro, pero es lo unico que se puede decir.
+    return offering.tuitionFee
+      ? { monto: formatCurrency(offering.tuitionFee), detalle: "de matrícula" }
+      : null;
+  }
+
+  const barata = opciones.reduce((a, b) => (b.monto < a.monto ? b : a));
+  const sufijo = totales.length > 0 ? "" : "/mes";
+  // La matricula se paga siempre: omitirla haria que el "desde" prometa menos
+  // de lo que realmente cuesta empezar.
+  const conMatricula = offering.tuitionFee ? " · + matrícula" : "";
+
+  return {
+    monto: `${formatCurrency(barata.monto)}${sufijo}`,
+    detalle: `${barata.detalle}${conMatricula}`,
+  };
 }
 
 // Costos del drawer, encuadrados comercialmente: el precio con tarjeta es el
@@ -206,7 +230,15 @@ export function OfferingCard({ offering }: { offering: CourseOffering }) {
           {offering.frequency && <li>🔁 {offering.frequency}</li>}
         </ul>
 
-        {price && <p className="mt-3 text-sm font-semibold text-ink">{price}</p>}
+        {price && (
+          <div className="mt-3">
+            <p className="text-base font-semibold text-ink">
+              <span className="text-xs font-medium text-ink-soft uppercase">desde </span>
+              {price.monto}
+            </p>
+            <p className="text-xs text-ink-soft">{price.detalle}</p>
+          </div>
+        )}
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <Sheet>
