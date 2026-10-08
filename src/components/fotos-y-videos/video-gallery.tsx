@@ -5,7 +5,27 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
-import type { GalleryVideo } from "@/lib/gallery";
+import type { FeaturedVideo as FeaturedVideoData, GalleryVideo } from "@/lib/gallery";
+
+export function FeaturedVideo({ video }: { video: FeaturedVideoData }) {
+  return (
+    <div className="mx-auto max-w-4xl">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border">
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?cc_load_policy=0`}
+          title={video.title}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          loading="lazy"
+          className="absolute inset-0 size-full"
+        />
+      </div>
+      <p className="mt-3 text-center font-heading text-base font-semibold text-ink">
+        {video.title}
+      </p>
+    </div>
+  );
+}
 
 function VideoEmbed({
   video,

@@ -4,8 +4,23 @@ export type GalleryVideo = {
   driveId: string;
 };
 
-/** Fotos reales de clases y eventos, extraídas del Google Sites. */
-export const PHOTOS: string[] = [
+export type FeaturedVideo = {
+  title: string;
+  /** ID del video en YouTube (de la URL youtu.be/{ID}). */
+  youtubeId: string;
+};
+
+/** Fotos del instituto (clases y espacios). La foto-01 va al final. */
+export const INSTITUTO_PHOTOS: string[] = [
+  ...Array.from(
+    { length: 29 },
+    (_, i) => `/images/instituto/foto-${String(i + 2).padStart(2, "0")}.jpg`
+  ),
+  "/images/instituto/foto-01.jpg",
+];
+
+/** Fotos de celebraciones y eventos, extraídas del Google Sites. */
+export const CELEBRACION_PHOTOS: string[] = [
   "/images/gsite/foto-02.jpg",
   "/images/gsite/foto-03.jpg",
   "/images/gsite/foto-04.jpg",
@@ -141,6 +156,12 @@ export const PHOTOS: string[] = [
   "/images/gsite/foto-134.jpg",
 ];
 
+export const FEATURED_VIDEO: FeaturedVideo = {
+  title: "Video institucional",
+  youtubeId: "cEOPNrtjBPM",
+};
+
+/** Otros videos (promocionales de cada idioma). */
 export const VIDEOS: GalleryVideo[] = [
   { title: "Video promocional - Japonés", driveId: "17Qvx0pYSxoe7ptfwMxbOfyuvmCu08g7f" },
   { title: "Video promocional - Chino Mandarín", driveId: "1B9bgUB7D4lEDTC4cOn4S5dXqFIMPMdGj" },
